@@ -1,0 +1,395 @@
+\documentclass[11pt,preprint, authoryear]{elsarticle}
+
+\usepackage{lmodern}
+%%%% My spacing
+\usepackage{setspace}
+\setstretch{1.2}
+\DeclareMathSizes{12}{14}{10}{10}
+
+% Wrap around which gives all figures included the [H] command, or places it "here". This can be tedious to code in Rmarkdown.
+\usepackage{float}
+\let\origfigure\figure
+\let\endorigfigure\endfigure
+\renewenvironment{figure}[1][2] {
+    \expandafter\origfigure\expandafter[H]
+} {
+    \endorigfigure
+}
+
+\let\origtable\table
+\let\endorigtable\endtable
+\renewenvironment{table}[1][2] {
+    \expandafter\origtable\expandafter[H]
+} {
+    \endorigtable
+}
+
+
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+    \usepackage{xltxtra,xunicode}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\fi
+
+\usepackage{amssymb, amsmath, amsthm, amsfonts}
+
+\def\bibsection{\section*{References}} %%% Make "References" appear before bibliography
+
+
+\usepackage[round]{natbib}
+\bibliographystyle{plainnat}
+
+\usepackage{longtable}
+\usepackage[margin=2.3cm,bottom=2cm,top=2.5cm, includefoot]{geometry}
+\usepackage{fancyhdr}
+\usepackage[bottom, hang, flushmargin]{footmisc}
+\usepackage{graphicx}
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1.3ex plus 0.5ex minus 0.3ex}
+\usepackage{textcomp}
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\usepackage{array}
+\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
+
+%%%%  Remove the "preprint submitted to" part. Don't worry about this either, it just looks better without it:
+\makeatletter
+\def\ps@pprintTitle{%
+  \let\@oddhead\@empty
+  \let\@evenhead\@empty
+  \let\@oddfoot\@empty
+  \let\@evenfoot\@oddfoot
+}
+\makeatother
+
+ \def\tightlist{} % This allows for subbullets!
+
+\usepackage{hyperref}
+\hypersetup{breaklinks=true,
+            bookmarks=true,
+            colorlinks=true,
+            citecolor=blue,
+            urlcolor=blue,
+            linkcolor=blue,
+            pdfborder={0 0 0}}
+
+
+% The following packages allow huxtable to work:
+\usepackage{siunitx}
+\usepackage{multirow}
+\usepackage{hhline}
+\usepackage{calc}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{colortbl}
+
+\urlstyle{same}  % don't use monospace font for urls
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\setcounter{secnumdepth}{5}
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+
+%%% Include extra packages specified by user
+% Insert custom packages here as follows
+% \usepackage{tikz}
+
+%%% Hard setting column skips for reports - this ensures greater consistency and control over the length settings in the document.
+%% page layout
+%% paragraphs
+\setlength{\baselineskip}{12pt plus 0pt minus 0pt}
+\setlength{\parskip}{12pt plus 0pt minus 0pt}
+\setlength{\parindent}{0pt plus 0pt minus 0pt}
+%% floats
+\setlength{\floatsep}{12pt plus 0 pt minus 0pt}
+\setlength{\textfloatsep}{20pt plus 0pt minus 0pt}
+\setlength{\intextsep}{14pt plus 0pt minus 0pt}
+\setlength{\dbltextfloatsep}{20pt plus 0pt minus 0pt}
+\setlength{\dblfloatsep}{14pt plus 0pt minus 0pt}
+%% maths
+\setlength{\abovedisplayskip}{12pt plus 0pt minus 0pt}
+\setlength{\belowdisplayskip}{12pt plus 0pt minus 0pt}
+%% lists
+\setlength{\topsep}{10pt plus 0pt minus 0pt}
+\setlength{\partopsep}{3pt plus 0pt minus 0pt}
+\setlength{\itemsep}{5pt plus 0pt minus 0pt}
+\setlength{\labelsep}{8mm plus 0mm minus 0mm}
+\setlength{\parsep}{\the\parskip}
+\setlength{\listparindent}{\the\parindent}
+%% verbatim
+\setlength{\fboxsep}{5pt plus 0pt minus 0pt}
+
+
+
+\begin{document}
+
+\begin{frontmatter}  %
+
+\title{Working in Texevier example}
+
+% Set to FALSE if wanting to remove title (for submission)
+
+
+
+
+\author[Add1]{Roan Minnie}
+\ead{roanminnie@gmail.com}
+
+
+
+
+
+\address[Add1]{Stellenbosch University, Stellenbosch, South Africa}
+
+\cortext[cor]{Corresponding author: Roan Minnie}
+
+
+\vspace{1cm}
+
+\begin{keyword}
+\footnotesize{
+Multivariate GARCH \sep Kalman Filter \sep Copula \\ \vspace{0.3cm}
+\textit{JEL classification} L250 \sep L100
+}
+\end{keyword}
+\vspace{0.5cm}
+\end{frontmatter}
+
+
+
+%________________________
+% Header and Footers
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\chead{}
+\rhead{}
+\lfoot{}
+\rfoot{\footnotesize Page \thepage\\}
+\lhead{}
+%\rfoot{\footnotesize Page \thepage\ } % "e.g. Page 2"
+\cfoot{}
+
+%\setlength\headheight{30pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%________________________
+
+\headsep 35pt % So that header does not go over title
+
+
+
+
+\section{\texorpdfstring{Introduction
+\label{Introduction}}{Introduction }}\label{introduction}
+
+This is a short assignment to demonstrate that I am able to neatly write
+up a summary that includes figures and tables. This article was writen
+using Texevier (Katzke \protect\hyperlink{ref-Texevier}{2017})
+
+\section{\texorpdfstring{Summary table
+\label{summary}}{Summary table }}\label{summary-table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{rlrrrrrr}
+  \hline
+ & Ticker & mean & std\_dev & mean.1 & std\_dev.1 & mean.2 & std\_dev.2 \\ 
+  \hline
+1 & JSE.ABSP.Close & -0.00 & 0.01 & 0.00 & 0.01 & -0.00 & 0.01 \\ 
+  2 & JSE.BVT.Close & 0.00 & 0.02 & 0.00 & 0.01 & 0.00 & 0.01 \\ 
+  3 & JSE.FSR.Close & 0.00 & 0.03 & 0.00 & 0.02 & 0.00 & 0.01 \\ 
+  4 & JSE.NBKP.Close & -0.00 & 0.01 & 0.00 & 0.01 & -0.00 & 0.01 \\ 
+  5 & JSE.RMH.Close & 0.00 & 0.03 & 0.00 & 0.02 & 0.00 & 0.02 \\ 
+  6 & JSE.SBK.Close & 0.00 & 0.02 & 0.00 & 0.01 & 0.00 & 0.01 \\ 
+  7 & JSE.SLM.Close & 0.00 & 0.02 & 0.00 & 0.01 & 0.00 & 0.02 \\ 
+   \hline
+\end{tabular}
+\caption{Short Table Example \label{tab1}} 
+\end{table}
+
+From table \ref{tab1} we can see that it confirms the argument presented
+in Tsay (\protect\hyperlink{ref-Tsay1989}{1989})\ldots{} Table
+\ref{tab1} shows that the mean and standard deviation do not vary across
+subsamples. \#Unconditional correlation
+
+Table \ref{tab2} below shows the unconditional correlation of each of
+the seven stocks.
+
+\begingroup\fontsize{12pt}{13pt}\selectfont
+
+\begin{longtable}{rrrrr}
+  \toprule
+ & Correlation & p-value & Lower CI & Upper CI \\ 
+  \hline 
+\endhead 
+\hline 
+{\footnotesize Continued on next page} 
+\endfoot 
+\endlastfoot 
+ \midrule
+JSE.ABSP.Close to JSE.ABSP.Close & 1.00 & 0.00 & 1.00 & 1.00 \\ 
+  JSE.ABSP.Close to JSE.BVT.Close & 0.02 & 0.36 & -0.02 & 0.06 \\ 
+  JSE.ABSP.Close to JSE.FSR.Close & 0.01 & 0.69 & -0.03 & 0.05 \\ 
+  JSE.ABSP.Close to JSE.NBKP.Close & 0.18 & 0.00 & 0.14 & 0.22 \\ 
+  JSE.ABSP.Close to JSE.RMH.Close & 0.05 & 0.03 & 0.00 & 0.09 \\ 
+  JSE.ABSP.Close to JSE.SBK.Close & 0.04 & 0.03 & 0.00 & 0.09 \\ 
+  JSE.ABSP.Close to JSE.SLM.Close & 0.04 & 0.07 & -0.00 & 0.08 \\ 
+  JSE.BVT.Close to JSE.ABSP.Close & 0.02 & 0.36 & -0.02 & 0.06 \\ 
+  JSE.BVT.Close to JSE.BVT.Close & 1.00 & 0.00 & 1.00 & 1.00 \\ 
+  JSE.BVT.Close to JSE.FSR.Close & 0.50 & 0.00 & 0.47 & 0.53 \\ 
+  JSE.BVT.Close to JSE.NBKP.Close & 0.04 & 0.06 & -0.00 & 0.08 \\ 
+  JSE.BVT.Close to JSE.RMH.Close & 0.48 & 0.00 & 0.44 & 0.51 \\ 
+  JSE.BVT.Close to JSE.SBK.Close & 0.50 & 0.00 & 0.47 & 0.53 \\ 
+  JSE.BVT.Close to JSE.SLM.Close & 0.49 & 0.00 & 0.45 & 0.52 \\ 
+  JSE.FSR.Close to JSE.ABSP.Close & 0.01 & 0.69 & -0.03 & 0.05 \\ 
+  JSE.FSR.Close to JSE.BVT.Close & 0.50 & 0.00 & 0.47 & 0.53 \\ 
+  JSE.FSR.Close to JSE.FSR.Close & 1.00 & 0.00 & 1.00 & 1.00 \\ 
+  JSE.FSR.Close to JSE.NBKP.Close & 0.01 & 0.62 & -0.03 & 0.05 \\ 
+  JSE.FSR.Close to JSE.RMH.Close & 0.76 & 0.00 & 0.74 & 0.78 \\ 
+  JSE.FSR.Close to JSE.SBK.Close & 0.71 & 0.00 & 0.69 & 0.73 \\ 
+  JSE.FSR.Close to JSE.SLM.Close & 0.51 & 0.00 & 0.48 & 0.54 \\ 
+  JSE.NBKP.Close to JSE.ABSP.Close & 0.18 & 0.00 & 0.14 & 0.22 \\ 
+  JSE.NBKP.Close to JSE.BVT.Close & 0.04 & 0.06 & -0.00 & 0.08 \\ 
+  JSE.NBKP.Close to JSE.FSR.Close & 0.01 & 0.62 & -0.03 & 0.05 \\ 
+  JSE.NBKP.Close to JSE.NBKP.Close & 1.00 & 0.00 & 1.00 & 1.00 \\ 
+  JSE.NBKP.Close to JSE.RMH.Close & -0.00 & 0.90 & -0.04 & 0.04 \\ 
+  JSE.NBKP.Close to JSE.SBK.Close & 0.02 & 0.31 & -0.02 & 0.06 \\ 
+  JSE.NBKP.Close to JSE.SLM.Close & 0.04 & 0.05 & 0.00 & 0.08 \\ 
+  JSE.RMH.Close to JSE.ABSP.Close & 0.05 & 0.03 & 0.00 & 0.09 \\ 
+  JSE.RMH.Close to JSE.BVT.Close & 0.48 & 0.00 & 0.44 & 0.51 \\ 
+  JSE.RMH.Close to JSE.FSR.Close & 0.76 & 0.00 & 0.74 & 0.78 \\ 
+  JSE.RMH.Close to JSE.NBKP.Close & -0.00 & 0.90 & -0.04 & 0.04 \\ 
+  JSE.RMH.Close to JSE.RMH.Close & 1.00 & 0.00 & 1.00 & 1.00 \\ 
+  JSE.RMH.Close to JSE.SBK.Close & 0.65 & 0.00 & 0.63 & 0.67 \\ 
+  JSE.RMH.Close to JSE.SLM.Close & 0.50 & 0.00 & 0.46 & 0.53 \\ 
+  JSE.SBK.Close to JSE.ABSP.Close & 0.04 & 0.03 & 0.00 & 0.09 \\ 
+  JSE.SBK.Close to JSE.BVT.Close & 0.50 & 0.00 & 0.47 & 0.53 \\ 
+  JSE.SBK.Close to JSE.FSR.Close & 0.71 & 0.00 & 0.69 & 0.73 \\ 
+  JSE.SBK.Close to JSE.NBKP.Close & 0.02 & 0.31 & -0.02 & 0.06 \\ 
+  JSE.SBK.Close to JSE.RMH.Close & 0.65 & 0.00 & 0.63 & 0.67 \\ 
+  JSE.SBK.Close to JSE.SBK.Close & 1.00 & 0.00 & 1.00 & 1.00 \\ 
+  JSE.SBK.Close to JSE.SLM.Close & 0.52 & 0.00 & 0.49 & 0.55 \\ 
+  JSE.SLM.Close to JSE.ABSP.Close & 0.04 & 0.07 & -0.00 & 0.08 \\ 
+  JSE.SLM.Close to JSE.BVT.Close & 0.49 & 0.00 & 0.45 & 0.52 \\ 
+  JSE.SLM.Close to JSE.FSR.Close & 0.51 & 0.00 & 0.48 & 0.54 \\ 
+  JSE.SLM.Close to JSE.NBKP.Close & 0.04 & 0.05 & 0.00 & 0.08 \\ 
+  JSE.SLM.Close to JSE.RMH.Close & 0.50 & 0.00 & 0.46 & 0.53 \\ 
+  JSE.SLM.Close to JSE.SBK.Close & 0.52 & 0.00 & 0.49 & 0.55 \\ 
+  JSE.SLM.Close to JSE.SLM.Close & 1.00 & 0.00 & 1.00 & 1.00 \\ 
+   \bottomrule
+\caption{Unconditional correlation between stocks \label{tab2}} 
+\end{longtable}
+
+\endgroup
+
+\section{Plotting the arch processes}\label{plotting-the-arch-processes}
+
+\begin{figure}[H]
+
+{\centering \includegraphics{Template_files/figure-latex/figure2-1} 
+
+}
+
+\caption{ABSP \label{absp}}\label{fig:figure2}
+\end{figure}\begin{figure}[H]
+
+{\centering \includegraphics{Template_files/figure-latex/figure3-1} 
+
+}
+
+\caption{BVT \label{bvt}}\label{fig:figure3}
+\end{figure}\begin{figure}[H]
+
+{\centering \includegraphics{Template_files/figure-latex/figure4-1} 
+
+}
+
+\caption{FSR \label{fsr}}\label{fig:figure4}
+\end{figure}\begin{figure}[H]
+
+{\centering \includegraphics{Template_files/figure-latex/figure5-1} 
+
+}
+
+\caption{NBKP \label{nbkp}}\label{fig:figure5}
+\end{figure}\begin{figure}[H]
+
+{\centering \includegraphics{Template_files/figure-latex/figure6-1} 
+
+}
+
+\caption{RMH \label{rmh}}\label{fig:figure6}
+\end{figure}\begin{figure}[H]
+
+{\centering \includegraphics{Template_files/figure-latex/figure7-1} 
+
+}
+
+\caption{SBK \label{sbk}}\label{fig:figure7}
+\end{figure}\begin{figure}[H]
+
+{\centering \includegraphics{Template_files/figure-latex/figure8-1} 
+
+}
+
+\caption{SLM \label{slm}}\label{fig:figure8}
+\end{figure}
+
+\section{Cumulative returns for a
+portfolio}\label{cumulative-returns-for-a-portfolio}
+
+Below is the cumulative returns series of a portfolio that is equally
+weighted to each of the stocks, reweighted each year on the last day of
+June.
+
+\begin{figure}[H]
+
+{\centering \includegraphics{Template_files/figure-latex/figure9-1} 
+
+}
+
+\caption{Portfolio cumulative returns \label{sbk}}\label{fig:figure9}
+\end{figure}
+
+\section*{References}\label{references}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\hypertarget{ref-Texevier}{}
+Katzke, N.F. 2017. \emph{Texevier: Package to Create Elsevier Templates
+for Rmarkdown}. Stellenbosch, South Africa: Bureau for Economic
+Research.
+
+\hypertarget{ref-Tsay1989}{}
+Tsay, Ruey S. 1989. ``Testing and Modeling Threshold Autoregressive
+Processes.'' \emph{Journal of the American Statistical Association} 84
+(405). Taylor \& Francis Group: 231--40.
+
+% Force include bibliography in my chosen format:
+
+\bibliographystyle{Tex/Texevier}
+\bibliography{Tex/ref}
+
+
+
+
+
+\end{document}

@@ -1,0 +1,177 @@
+---
+title: "README"
+author: "Roan Minnie"
+date: "16 October 2018"
+output: html_document
+---
+#Setup
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5, fig.pos="H", fig.pos = 'H')
+```
+Loading the necessary packages and data
+```{r}
+library(rmsfuns)
+load_pkg(c("tidyverse", "devtools", "rugarch", "forecast", "tbl2xts", 
+    "lubridate", "PerformanceAnalytics", "MTS", "ggthemes","xtable", "rportfolios"))
+dailydata <- read_csv("https://raw.githubusercontent.com/Nicktz/ExDat/master/extdata/findata.csv", 
+    col_types = cols(.default = "d", Date = "D"))
+tidydata <- dailydata %>% arrange(Date) %>% gather(Ticker, Price, -Date)
+```
+
+
+Create the necessary folders
+```{r}
+Practical.loc.root <- file.path(getwd())
+Practical.loc.subdirs <- c("data", "code", "bin")
+PracLoc <- build_path(glue::glue("{Practical.loc.root}/{Practical.loc.subdirs}"))
+```
+#Calculating the summary table
+```{r}
+#use the funtion moments in the code file
+source("code/moments.R")
+
+#apply this function for the specified periods
+period1 <- moments("2008-12-31", "2006-05-18")
+period2 <- moments("2013-12-31", "2009-12-31")
+period3 <- moments("2015-07-31", "2013-12-31")
+
+#create a dataframe combining the three dataframes above
+summary_table <- data.frame(c(period1, period2 [,2:3], period3 [,2:3]))
+
+```
+
+#Calculating unconditional correlations
+
+```{r}
+#First calculate the log returns
+returns <- (
+  diff(log(dailydata %>% arrange(Date) %>% tbl_xts()), lag=1)*100)
+
+#now drop the first date of every series
+returns <- returns[-1,]
+
+#calculate the correlation table
+correlation <- table.Correlation(Ra = returns, Rb = returns) 
+```
+
+#Plot the univariate GARCH ht process
+Prep the dataset first:
+```{r}
+#create a simple return dataframe
+
+rtn <- (diff(
+  log(dailydata %>% arrange(Date) %>% tbl_xts()), lag=1)
+)*100 
+rtn <- rtn[-1,]
+rtn <- scale(rtn, center=T, scale=F)
+```
+
+```{r}
+Rtn <- log(1 + rtn/100)*100 
+Rtn <- Rtn %>% xts_tbl() %>% gather(Ticker, Return, -date)
+Rtn$date <-  as.Date(x = Rtn$date, format="%Y-%m-%d")
+
+source("code/arch_calc.R")
+ABSP <- arch_calc("JSE.ABSP.Close")
+BVT <- arch_calc("JSE.BVT.Close")
+FSR <- arch_calc("JSE.FSR.Close")
+NBKP <- arch_calc("JSE.NBKP.Close")
+RMH <- arch_calc("JSE.RMH.Close")
+SBK <- arch_calc("JSE.SBK.Close")
+SLM <- arch_calc("JSE.SLM.Close")
+
+colnames(ABSP) = c("date","Returns", "Returns_sqd", "Returns_abs")
+colnames(BVT) = c("date","Returns", "Returns_sqd", "Returns_abs")
+colnames(FSR) = c("date","Returns", "Returns_sqd", "Returns_abs")
+colnames(NBKP) = c("date","Returns", "Returns_sqd", "Returns_abs")
+colnames(RMH) = c("date","Returns", "Returns_sqd", "Returns_abs")
+colnames(SBK) = c("date","Returns", "Returns_sqd", "Returns_abs")
+colnames(SLM) = c("date","Returns", "Returns_sqd", "Returns_abs")
+```
+
+```{r}
+source("code/arch_plot.R")
+plot_absp <- arch_plot(ABSP)
+plot_bvt <- arch_plot(BVT)
+plot_fsr <- arch_plot(FSR)
+plot_nbkp <- arch_plot(NBKP)
+plot_rmh <- arch_plot(RMH)
+plot_sbk <- arch_plot(SBK)
+plot_slm <- arch_plot(SLM)
+```
+
+#Calculate an equally weighted portfolio
+```{r}
+#Refer to practical 5 for a discussion of what is going on in this script. 
+load_pkg("TTR")
+data_adj <- dailydata %>% arrange(Date) %>% mutate_at(.vars = vars(-Date),
+.funs = funs(ROC(., type = c("continuous", "discrete")[2]))) %>%
+  mutate_at(.vars = vars(-Date), funs(na.locf(., na.rm = F, maxgap = 5)))
+
+data_adj <- data_adj %>% 
+  gather(Stocks, Returns, -Date)
+
+RebMonths <- 7
+
+RandomWeights <-
+data_adj %>%
+mutate(Months = as.double(format(Date, format = "%m")),
+YearMonths = as.double(format(Date, format = "%Y%m"))) %>%
+filter(Months %in% RebMonths) %>%
+  group_by(YearMonths, Stocks) %>% filter(Date == last(Date)) %>% 
+  ungroup() %>% 
+  arrange(Date) 
+
+Equal_weights <-
+RandomWeights %>%
+group_by(Date) %>%
+mutate(EqualWeights = 1/n()) %>% ungroup() %>% select(-Months, -YearMonths)
+
+Fund_Size_at_Start <- 1000
+
+EW_weights <- Equal_weights %>% 
+  select(Date, Stocks, EqualWeights) %>% 
+  spread(Stocks, EqualWeights) %>% tbl_xts()
+
+df_Returns <- data_adj %>% spread(Stocks, Returns)
+df_Returns[is.na(df_Returns)] <- 0
+xts_df_Returns <- df_Returns %>% tbl_xts()
+
+EW_RetPort <- Return.portfolio(xts_df_Returns, weights = EW_weights,
+verbose = TRUE, contribution = TRUE, value = Fund_Size_at_Start,
+geometric = TRUE)
+
+EW_Contribution <- EW_RetPort$contribution %>% xts_tbl() %>%
+mutate(date = lag(date), date = coalesce(date, index(EW_weights)[1]))
+EW_BPWeight <- EW_RetPort$BOP.Weight %>% xts_tbl() %>% mutate(date = lag(date),
+date = coalesce(date, index(EW_weights)[1]))
+EW_BPValue <- EW_RetPort$BOP.Value %>% xts_tbl() %>% mutate(date = lag(date),
+date = coalesce(date, index(EW_weights)[1]))
+
+df_port_return_EW <- left_join(data_adj %>% rename(date = Date),
+EW_BPWeight %>% gather(Stocks, weight, -date), by = c("date",
+"Stocks")) %>% left_join(., EW_BPValue %>% gather(Stocks,
+value_held, -date), by = c("date", "Stocks")) %>% left_join(.,
+EW_Contribution %>% gather(Stocks, Contribution, -date),
+by = c("date", "Stocks")) %>% 
+na.omit(df_port_return_EW)
+
+df_Portf_EW <- df_port_return_EW %>% group_by(date) %>% summarise(PortfolioReturn = sum(Returns *
+weight, na.rm = TRUE)) %>% filter(PortfolioReturn != 0)
+
+Cum_EW <- df_Portf_EW %>% mutate(cumreturn_EW = (cumprod(1 +
+PortfolioReturn) - 1)) %>% mutate(wealthindex_EW = 100 *
+(cumprod(1 + PortfolioReturn))) %>% select(-PortfolioReturn)
+
+portf_plot <- ggplot(data = Cum_EW)+
+  geom_line(aes(x = date, y = wealthindex_EW)) +
+    ggtitle("Portfolio returns") +
+    guides(alpha=FALSE, colour = FALSE) +
+    theme_fivethirtyeight()
+    
+```
+
+
+
+
+
